@@ -25,7 +25,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
     // Send a ping to confirm a successful connection
 
     // database
@@ -44,7 +44,17 @@ async function run() {
         const email = req.params.email ;
         const userEmail = {email: email}
         const result = await tasks.find(userEmail).toArray();
-        console.log(result)
+        // console.log(result)
+        res.send(result)
+    })
+
+      // get tasks single
+      app.get("/tasks_single/:taskId",async(req,res)=>{
+        const id = req.params.taskId ;
+        // console.log("iddd",id)
+        const query = { _id: new ObjectId(id)}
+        const result = await tasks.findOne(query);
+        // console.log("hi",result)
         res.send(result)
     })
 
@@ -57,6 +67,27 @@ async function run() {
       res.send(result)
     })
 
+    // update
+    app.put("/tasks_update/:id",async(req,res) =>{
+      const id = req.params.id
+      const task = req.body;
+    
+
+      const filter = {_id: new ObjectId(id)}
+        const options = {updsert:true}
+        const updatedTask = {
+            $set:{
+                title:task.title ,
+                deadline:task.deadline,
+                description:task.description,
+                priority:task.priority,
+            }
+        }
+
+        const result = await tasks.updateOne(filter,updatedTask, options )
+        res.send(result)
+
+    })
 
 
 
